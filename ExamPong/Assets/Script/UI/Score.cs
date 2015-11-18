@@ -15,7 +15,7 @@ public class Score : MonoBehaviour {
     int m_rightScore;
 
     void Awake() {
-        AssertUtil.Assert(m_leftScore != null && m_rightScore != null);
+        AssertUtil.Assert(m_leftScoreText != null && m_rightScoreText != null);
     }
 
     public void Show() {
