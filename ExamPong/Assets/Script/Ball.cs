@@ -6,12 +6,22 @@ using System.Collections;
 
 public class Ball : MonoBehaviour {
 
+    public delegate void OnBallEnterCollision(Collision collision);
+    public event OnBallEnterCollision EnterCollisionEvent;
+
+    public delegate void OnBallEnterTrigger(Collider collider);
+    public event OnBallEnterTrigger EnterTriggerEvent;
+
     void OnCollisionEnter(Collision collision) {
-        Debug.Log("Collision Enter");
+        if (EnterCollisionEvent != null) {
+            EnterCollisionEvent(collision);
+        }
     }
 
     void OnTriggerEnter(Collider collider) {
-        Debug.Log("Trigger Enter");
+        if (EnterTriggerEvent != null) {
+            EnterTriggerEvent(collider);
+        }
     }
     
 }
