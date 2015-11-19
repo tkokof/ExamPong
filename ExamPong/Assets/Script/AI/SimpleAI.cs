@@ -1,16 +1,22 @@
 ﻿// desc simple AI class
 // maintainer hugoyu
+// TODO improve
 
+using System.Collections;
 using UnityEngine;
 
 class SimpleAI : MonoBehaviour {
 
     public float m_aiInputSpeed;
-    public Vector2 m_aiInputRandom;
 
     public Paddle m_controlPaddle;
-
     Ball m_gameBall;
+
+    public Vector2 m_aiInputRandomAttack;
+    public Vector2 m_aiInputRandomDefend;
+
+    float m_curRandomValAttack;
+    float m_curRandomValDefend;
 
     void Awake() {
         AssertUtil.Assert(m_controlPaddle != null);
@@ -18,20 +24,46 @@ class SimpleAI : MonoBehaviour {
 
     void Start() {
         m_gameBall = Game.GetInstance().GetBall();
+
+        StartCoroutine(UpdateInputRandom());
+    }
+
+    IEnumerator UpdateInputRandom() {
+        // TODO improve
+        var intervalTime = 1;
+
+        while (true) {
+            m_curRandomValAttack = Random.Range(m_aiInputRandomAttack.x, m_aiInputRandomAttack.y);
+            m_curRandomValDefend = Random.Range(m_aiInputRandomDefend.x, m_aiInputRandomDefend.y);
+            yield return new WaitForSeconds(intervalTime);
+        }
     }
 
     void Update() {
+        // first calculate target position
         var ballPosition = m_gameBall.transform.position;
         var paddlePosition = m_controlPaddle.transform.position;
 
-        var targetInput = ballPosition.y - paddlePosition.y;
-        targetInput = Mathf.Clamp(targetInput, -m_aiInputSpeed, m_aiInputSpeed);
+        bool isAttacking = true;
+        var ballVelocity = m_gameBall.GetComponent<Rigidbody>().velocity;
+        if (ballVelocity.x > 0) {
+            isAttacking = false;
+        }
+
+        var targetHeight = ballPosition.y;
+        if (isAttacking) {
+            targetHeight = 0;
+        }
+
+        // then calculate delta
+        var inputHeight = targetHeight - paddlePosition.y;
+        inputHeight = Mathf.Clamp(inputHeight, -m_aiInputSpeed, m_aiInputSpeed);
 
         // random target input
-        var random = Random.Range(m_aiInputRandom.x, m_aiInputRandom.y);
-        targetInput *= random;
+        var random = isAttacking ? m_curRandomValAttack : m_curRandomValDefend;
+        inputHeight *= random;
 
-        m_controlPaddle.Move(targetInput);
+        m_controlPaddle.Move(inputHeight);
     }
 
 }

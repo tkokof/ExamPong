@@ -117,6 +117,8 @@ public class Game : MonoBehaviour, ISingleton<Game> {
 
     void ResetBallAndPaddle() {
         m_ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        m_ball.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+
         m_ball.transform.position = m_ballOriPos;
         m_paddleLeft.transform.position = m_paddleLeftOriPos;
         m_paddleRight.transform.position = m_paddleRightOriPos;
