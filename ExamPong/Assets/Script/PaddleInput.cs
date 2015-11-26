@@ -2,9 +2,10 @@
 // maintainer hugoyu
 
 using UnityEngine;
+using UnityEngine.Networking;
 
 // NOTE not so sure about this ...
-public class PaddleInput : MonoBehaviour {
+public class PaddleInput : NetworkBehaviour {
 
     public float m_inputSpeed;
     public Paddle m_paddleRef;
@@ -17,10 +18,12 @@ public class PaddleInput : MonoBehaviour {
 
     void Update() {
         if (m_paddleRef) {
-            var vertInput = Input.GetAxis("Vertical");
-            float moveDist = vertInput * m_inputSpeed;
+            if (isLocalPlayer) {
+                var vertInput = Input.GetAxis("Vertical");
+                float moveDist = vertInput * m_inputSpeed;
 
-            m_paddleRef.Move(moveDist);
+                m_paddleRef.Move(moveDist);
+            }
         }
     }
 
