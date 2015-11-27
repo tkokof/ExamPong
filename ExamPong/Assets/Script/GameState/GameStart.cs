@@ -15,6 +15,8 @@ public class GameStart : GameState {
     }
 
     public override void OnEnter() {
+        base.OnEnter();
+
         m_ball = Game.GetInstance().GetBall();
         m_paddle = Game.GetInstance().GetPaddleLeft();
 
@@ -23,26 +25,29 @@ public class GameStart : GameState {
         var paddleTransform = m_paddle.GetComponent<Transform>();
         m_ballOriTransParent = ballTransform.parent;
         ballTransform.parent = paddleTransform;
+
+        InputManager.GetInstance().RegisterListener(OnInput);
     }
 
     public override void OnUpdate() {
-        if (m_paddle) {
-            UpdateInput();
-            // TODO other things here ...
-        }
+        // TODO implement
     }
 
     public override void OnLeave() {
         // rollback ball transform hierarchy
         var ballTransform = m_ball.GetComponent<Transform>();
         ballTransform.parent = m_ballOriTransParent;
+
+        InputManager.GetInstance().UnregisterListener(OnInput);
+
+        base.OnLeave();
     }
 
     // inner functions
  
-    void OnMovePaddle(float inputValue) {
+    void OnMovePaddle(Paddle paddle, float inputValue) {
         float moveDist = inputValue * m_startInputSpeed;
-        m_paddle.Move(moveDist);
+        paddle.Move(moveDist);
     }
 
     void OnEmitBall() {
@@ -55,14 +60,18 @@ public class GameStart : GameState {
         m_ball.GetComponent<Rigidbody>().AddForce(m_emitImpulse, m_emitImpulse, 0, ForceMode.Impulse);
     }
 
-    void UpdateInput() {
-        var vertInput = Input.GetAxis("Vertical");
-        if (!Mathf.Equals(vertInput, 0)) {
-            OnMovePaddle(vertInput);
-        }
-
-        if (Input.GetButton("Fire1")) {
-            OnEmitBall();
+    void OnInput(InputData inputData) {
+        var inputType = inputData.GetType();
+        switch (inputType) {
+            case InputData.InputType.Fire:
+                OnEmitBall();
+                break;
+            case InputData.InputType.Move:
+                var target = inputData.GetTarget();
+                var moveDist = inputData.GetParamByIndex(0);
+                OnMovePaddle(target, moveDist);
+                break;
         }
     }
+
 }

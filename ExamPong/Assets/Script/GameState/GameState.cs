@@ -15,5 +15,5 @@ public class GameState : MonoBehaviour {
 
     public virtual void OnLeave() {
     }
-	
+
 }

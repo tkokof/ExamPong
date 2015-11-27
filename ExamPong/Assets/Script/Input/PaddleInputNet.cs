@@ -5,24 +5,24 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 // NOTE not so sure about this ...
-public class PaddleInput : NetworkBehaviour {
+public class PaddleInputNet : NetworkBehaviour {
 
     public float m_inputSpeed;
-    public Paddle m_paddleRef;
+    Paddle m_paddle;
 
     void Start() {
-        if (m_paddleRef == null) {
-            m_paddleRef = GetComponent<Paddle>();
+        if (m_paddle == null) {
+            m_paddle = GetComponent<Paddle>();
         }
     }
 
     void Update() {
-        if (m_paddleRef) {
+        if (m_paddle) {
             if (isLocalPlayer) {
                 var vertInput = Input.GetAxis("Vertical");
                 float moveDist = vertInput * m_inputSpeed;
 
-                m_paddleRef.Move(moveDist);
+                m_paddle.Move(moveDist);
             }
         }
     }

@@ -5,34 +5,39 @@ public class InGame : GameState {
 
     public float m_gameInputSpeed;
 
-    Paddle m_paddle;
-
     public override string GetName() {
         return "InGame";
     }
 
     public override void OnEnter() {
-        m_paddle = Game.GetInstance().GetPaddleLeft();
+        base.OnEnter();
+        InputManager.GetInstance().RegisterListener(OnInput);
     }
 
     public override void OnUpdate() {
-        if (m_paddle != null) {
-            UpdateInput();
-            // TODO other things here ...
-        }
+        // TODO implement
+    }
+
+    public override void OnLeave() {
+        InputManager.GetInstance().UnregisterListener(OnInput);
+        base.OnLeave();
     }
 
     // inner functions
 
-    void OnMovePaddle(float inputValue) {
+    void OnMovePaddle(Paddle paddle, float inputValue) {
         float moveDist = inputValue * m_gameInputSpeed;
-        m_paddle.Move(moveDist);
+        paddle.Move(moveDist);
     }
 
-    void UpdateInput() {
-        var vertInput = Input.GetAxis("Vertical");
-        if (!Mathf.Equals(vertInput, 0)) {
-            OnMovePaddle(vertInput);
+    void OnInput(InputData inputData) {
+        var inputType = inputData.GetType();
+        switch (inputType) {
+            case InputData.InputType.Move:
+                var target = inputData.GetTarget();
+                var moveDist = inputData.GetParamByIndex(0);
+                OnMovePaddle(target, moveDist);
+                break;
         }
     }
 

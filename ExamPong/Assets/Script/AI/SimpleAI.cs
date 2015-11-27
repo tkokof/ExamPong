@@ -63,7 +63,13 @@ class SimpleAI : MonoBehaviour {
         var random = isAttacking ? m_curRandomValAttack : m_curRandomValDefend;
         inputHeight *= random;
 
-        m_controlPaddle.Move(inputHeight);
+        // dispatch event here
+        if (!Mathf.Abs(inputHeight).Equals(0)) {
+            var inputData = InputData.GetInputData(InputData.InputType.Move,
+                                                   m_controlPaddle,
+                                                   inputHeight);
+            InputManager.GetInstance().DispatchInput(inputData);
+        }
     }
 
 }
