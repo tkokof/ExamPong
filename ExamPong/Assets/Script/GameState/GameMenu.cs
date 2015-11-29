@@ -3,13 +3,18 @@ using System.Collections;
 
 public class GameMenu : GameState {
 
-	// Use this for initialization
-	void Start () {
+    public override string GetName() {
+        return "GameMenu";
+    }
+
+    public override void OnEnter() {
+        base.OnEnter();
+    }
+
+    public override void OnLeave() {
+        // TODO implement
+
+        base.OnLeave();
+    }
 	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }

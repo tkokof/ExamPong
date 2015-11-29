@@ -15,21 +15,25 @@ class PaddleInputLocal : MonoBehaviour {
     }
 
     void Update() {
-        if (m_paddle) {
-                if (Input.GetButton("Fire1")) {
-                    var inputData = InputData.GetInputData(InputData.InputType.Fire,
-                                                           m_paddle);
-                    InputManager.GetInstance().DispatchInput(inputData);
-                }
+        UpdateInput();
+    }
 
-                var vertInput = Input.GetAxis("Vertical");
-                float moveDist = vertInput * m_inputSpeed;
-                if (!Mathf.Abs(moveDist).Equals(0)) {
-                    var inputData = InputData.GetInputData(InputData.InputType.Move,
-                                                           m_paddle,
-                                                           moveDist);
-                    InputManager.GetInstance().DispatchInput(inputData);
-                }
+    void UpdateInput() {
+        if (m_paddle) {
+            if (Input.GetButton("Fire1")) {
+                var inputData = InputData.GetInputData(InputData.InputType.Fire,
+                                                       m_paddle);
+                InputManager.GetInstance().DispatchInput(inputData);
+            }
+
+            var vertInput = Input.GetAxis("Vertical");
+            float moveDist = vertInput * m_inputSpeed;
+            if (!Mathf.Abs(moveDist).Equals(0)) {
+                var inputData = InputData.GetInputData(InputData.InputType.Move,
+                                                       m_paddle,
+                                                       moveDist);
+                InputManager.GetInstance().DispatchInput(inputData);
+            }
         }
     }
 

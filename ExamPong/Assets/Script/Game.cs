@@ -2,24 +2,28 @@
 // maintainer hugoyu
 
 using UnityEngine;
-using System.Collections;
 
 public class Game : MonoBehaviour, ISingleton<Game> {
 
-    public Ball m_ball;
-    public Paddle m_paddleLeft;
-    public Paddle m_paddleRight;
     public Collider m_colliderLeft;
     public Collider m_colliderRight;
 
     // game data buffer
-    Vector3 m_ballOriPos;
-    Vector3 m_paddleLeftOriPos;
-    Vector3 m_paddleRightOriPos;
+    public Vector3 m_ballOriPos;
+    public Vector3 m_paddleLeftOriPos;
+    public Vector3 m_paddleRightOriPos;
 
-    // game score
+    // game score data
     public int m_scoreThreshold;
-    public Score m_gameScore;
+    public int m_scoreLeft;
+    public int m_scoreRight;
+
+    public delegate void OnGameScoreChange(int leftScore, int rightScore);
+    public event OnGameScoreChange GameScoreChangeEvent;
+
+    Ball m_ball;
+    Paddle m_paddleLeft;
+    Paddle m_paddleRight;
 
     GameState m_gameState;
 
@@ -36,25 +40,13 @@ public class Game : MonoBehaviour, ISingleton<Game> {
     void Awake() {
         // handle singleton pattern
         SingletonUtil<Game>.Instance = this;
-
-        // check game refs
-        AssertUtil.Assert(m_ball != null, "Ball is null, please check ref setting!");
-        AssertUtil.Assert(m_paddleLeft != null, "Paddle Left is null, please check ref setting!");
-        AssertUtil.Assert(m_paddleRight != null, "Paddle Right is null, please check ref setting!");
-        AssertUtil.Assert(m_colliderLeft != null, "Collider Left is null, please check ref setting");
-        AssertUtil.Assert(m_colliderRight != null, "Collider Right is null, please check ref setting");
-
-        // buffer game data
-        m_ballOriPos = m_ball.transform.position;
-        m_paddleLeftOriPos = m_paddleLeft.transform.position;
-        m_paddleRightOriPos = m_paddleRight.transform.position;
     }
 
     public GameState GetGameState() {
         return m_gameState;
     }
 
-    public void SetGameState(GameState gameState) {
+    void SetGameState(GameState gameState) {
         if (m_gameState != null) {
             m_gameState.OnLeave();
         }
@@ -66,15 +58,30 @@ public class Game : MonoBehaviour, ISingleton<Game> {
         }
     }
 
-    void OnBallEnterTrigger(Collider collider) {
+    public void SetGameState(string stateName) {
+        var states = GetComponents<GameState>();
+        for (int i = 1; i < states.Length; ++i) {
+            if (states[i].GetName() == stateName) {
+                SetGameState(states[i]);
+                return;
+            }
+        }
+        AssertUtil.Assert(false, "Unknown state name : " + stateName);
+    }
+
+    public void Reset() {
+        ResetAll();
+    }
+
+    void OnBallExitTrigger(Collider collider) {
         if (collider == m_colliderLeft) {
-            m_gameScore.AddRightScore();
+            ++m_scoreRight;
         }
         else if (collider == m_colliderRight) {
-            m_gameScore.AddLeftScore();
+            ++m_scoreLeft;
         }
 
-        var gameResult = Check();
+        var gameResult = CheckResult();
         if (gameResult == GameResult.NoResult) {
             ResetBallAndPaddle();
             SetGameState(GetComponent<GameStart>());
@@ -83,30 +90,23 @@ public class Game : MonoBehaviour, ISingleton<Game> {
             ResetAll();
             SetGameState(GetComponent<GameStart>());
         }
+
+        if (GameScoreChangeEvent != null) {
+            GameScoreChangeEvent(m_scoreLeft, m_scoreRight);
+        }
     }
 
-    GameResult Check() {
-        var leftScore = m_gameScore.GetLeftScore();
-        var rightScore = m_gameScore.GetRightScore();
-
-        if (leftScore > m_scoreThreshold) {
+    GameResult CheckResult() {
+        if (m_scoreLeft > m_scoreThreshold) {
             Debug.Log("Left Win !!!");
             return GameResult.LeftWin;
         }
-        else if (rightScore > m_scoreThreshold) {
+        else if (m_scoreRight > m_scoreThreshold) {
             Debug.Log("Right Win !!!");
             return GameResult.RightWin;
         }
 
         return GameResult.NoResult;
-    }
-
-    void Start() {
-        // init ball event
-        m_ball.EnterTriggerEvent += OnBallEnterTrigger;
-
-        // set game state
-        SetGameState(GetComponent<GameStart>());
     }
 
     void Update() {
@@ -125,7 +125,12 @@ public class Game : MonoBehaviour, ISingleton<Game> {
     }
 
     void ResetScore() {
-        m_gameScore.Reset();
+        m_scoreLeft = 0;
+        m_scoreRight = 0;
+
+        if (GameScoreChangeEvent != null) {
+            GameScoreChangeEvent(m_scoreLeft, m_scoreRight);
+        }
     }
 
     void ResetAll() {
@@ -136,25 +141,37 @@ public class Game : MonoBehaviour, ISingleton<Game> {
         ResetScore();
     }
 
-    // utility functions
     public Ball GetBall() {
         return m_ball;
+    }
+
+    public void SetBall(Ball ball) {
+        if (m_ball != null) {
+            m_ball.ExitTriggerEvent -= OnBallExitTrigger;
+        }
+
+        m_ball = ball;
+        m_ball.ExitTriggerEvent += OnBallExitTrigger;
     }
 
     public Paddle GetPaddleLeft() {
         return m_paddleLeft;
     }
 
+    public void SetPaddleLeft(Paddle paddleLeft) {
+        m_paddleLeft = paddleLeft;
+    }
+
     public Paddle GetPaddleRight() {
         return m_paddleRight;
     }
 
-    public int GetScoreThreshold() {
-        return m_scoreThreshold;
+    public void SetPaddleRight(Paddle paddleRight) {
+        m_paddleRight = paddleRight;
     }
 
-    public Score GetScore() {
-        return m_gameScore;
+    public int GetScoreThreshold() {
+        return m_scoreThreshold;
     }
 
 }

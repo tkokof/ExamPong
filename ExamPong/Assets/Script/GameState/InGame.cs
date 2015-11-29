@@ -31,7 +31,7 @@ public class InGame : GameState {
     }
 
     void OnInput(InputData inputData) {
-        var inputType = inputData.GetType();
+        var inputType = inputData.GetInputType();
         switch (inputType) {
             case InputData.InputType.Move:
                 var target = inputData.GetTarget();

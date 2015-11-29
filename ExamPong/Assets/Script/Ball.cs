@@ -6,11 +6,15 @@ using System.Collections;
 
 public class Ball : MonoBehaviour {
 
-    public delegate void OnBallEnterCollision(Collision collision);
-    public event OnBallEnterCollision EnterCollisionEvent;
+    public delegate void CollisionDelegate(Collision collision);
+    public event CollisionDelegate EnterCollisionEvent;
+    public event CollisionDelegate StayCollisionEvent;
+    public event CollisionDelegate ExitCollisionEvent;
 
-    public delegate void OnBallEnterTrigger(Collider collider);
-    public event OnBallEnterTrigger EnterTriggerEvent;
+    public delegate void TriggerDelegate(Collider collider);
+    public event TriggerDelegate EnterTriggerEvent;
+    public event TriggerDelegate StayTriggerEvent;
+    public event TriggerDelegate ExitTriggerEvent;
 
     void OnCollisionEnter(Collision collision) {
         if (EnterCollisionEvent != null) {
@@ -18,9 +22,33 @@ public class Ball : MonoBehaviour {
         }
     }
 
+    void OnCollisionStay(Collision collision) {
+        if (StayCollisionEvent != null) {
+            StayCollisionEvent(collision);
+        }
+    }
+
+    void OnCollisionExit(Collision collision) {
+        if (ExitCollisionEvent != null) {
+            ExitCollisionEvent(collision);
+        }
+    }
+
     void OnTriggerEnter(Collider collider) {
         if (EnterTriggerEvent != null) {
             EnterTriggerEvent(collider);
+        }
+    }
+
+    void OnTriggerStay(Collider collider) {
+        if (StayTriggerEvent != null) {
+            StayTriggerEvent(collider);
+        }
+    }
+
+    void OnTriggerExit(Collider collider) {
+        if (ExitTriggerEvent != null) {
+            ExitTriggerEvent(collider);
         }
     }
     

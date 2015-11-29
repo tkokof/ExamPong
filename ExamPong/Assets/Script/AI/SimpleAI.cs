@@ -10,7 +10,7 @@ class SimpleAI : MonoBehaviour {
     public float m_aiInputSpeed;
 
     public Paddle m_controlPaddle;
-    Ball m_gameBall;
+    public Ball m_gameBall;
 
     public Vector2 m_aiInputRandomAttack;
     public Vector2 m_aiInputRandomDefend;
@@ -23,8 +23,6 @@ class SimpleAI : MonoBehaviour {
     }
 
     void Start() {
-        m_gameBall = Game.GetInstance().GetBall();
-
         StartCoroutine(UpdateInputRandom());
     }
 

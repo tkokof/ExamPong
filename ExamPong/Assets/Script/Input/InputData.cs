@@ -30,7 +30,7 @@ class InputData {
         param = param_;
     }
 
-    public InputType GetType() {
+    public InputType GetInputType() {
         return type;
     }
 

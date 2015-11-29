@@ -52,16 +52,14 @@ public class GameStart : GameState {
 
     void OnEmitBall() {
         // first set game state
-        var game = Game.GetInstance();
-        var ingameState = game.GetComponent<InGame>();
-        game.SetGameState(ingameState);
+        Game.GetInstance().SetGameState("InGame");
 
         // then add impulse to ball
         m_ball.GetComponent<Rigidbody>().AddForce(m_emitImpulse, m_emitImpulse, 0, ForceMode.Impulse);
     }
 
     void OnInput(InputData inputData) {
-        var inputType = inputData.GetType();
+        var inputType = inputData.GetInputType();
         switch (inputType) {
             case InputData.InputType.Fire:
                 OnEmitBall();

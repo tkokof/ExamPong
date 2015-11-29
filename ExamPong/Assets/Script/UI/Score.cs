@@ -2,7 +2,6 @@
 // maintainer hugoyu
 
 using UnityEngine;
-using System.Collections;
 
 // now score is view & model
 // TODO implement, like split model to separate class
