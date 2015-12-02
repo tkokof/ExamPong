@@ -9,6 +9,10 @@ public class Paddle : MonoBehaviour {
     private Transform m_transform;
     public Vector2 m_moveRange;
 
+    // NOTE: not so sure about this ...
+    public delegate void OnMove(Paddle paddle);
+    public event OnMove MoveEvent;
+
     void Awake() {
         m_transform = GetComponent<Transform>();
     }
@@ -23,6 +27,12 @@ public class Paddle : MonoBehaviour {
 
         // method 2 - physics force
         // TODO implement
+
+        if (!Mathf.Abs(moveDist).Equals(0)) {
+            if (MoveEvent != null) {
+                MoveEvent(this);
+            }
+        }
     }
 
 }
